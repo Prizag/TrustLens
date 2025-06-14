@@ -112,8 +112,8 @@ export default function AlertsPage() {
   return (
     <div className="p-4 md:p-6 space-y-6 w-full max-w-none">
       <div className="flex flex-col gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-black">Alert Center</h1>
-        <p className="text-muted-foreground text-sm md:text-base">Monitor and manage suspicious activity alerts</p>
+        <h1 className="text-2xl md:text-3xl font-bold text-black ml-10">Alert Center</h1>
+        <p className="text-muted-foreground text-sm md:text-base ml-10">Monitor and manage suspicious activity alerts</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">

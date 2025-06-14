@@ -19,8 +19,8 @@ export default function SettingsPage() {
   return (
     <div className="p-4 md:p-6 space-y-6 w-full max-w-none">
       <div className="flex flex-col gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-black">Settings</h1>
-        <p className="text-muted-foreground text-sm md:text-base">Manage your account and application preferences</p>
+        <h1 className="text-2xl md:text-3xl font-bold text-black ml-10">Settings</h1>
+        <p className="text-muted-foreground text-sm md:text-base ml-10">Manage your account and application preferences</p>
       </div>
 
       <Tabs defaultValue="account" value={activeTab} onValueChange={setActiveTab} className="space-y-4">

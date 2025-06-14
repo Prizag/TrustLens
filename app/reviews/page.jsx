@@ -94,8 +94,8 @@ export default function ReviewsPage() {
   return (
     <div className="p-4 md:p-6 space-y-6 w-full max-w-none">
       <div className="flex flex-col gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-black">Review Analysis</h1>
-        <p className="text-muted-foreground text-sm md:text-base">
+        <h1 className="text-2xl md:text-3xl font-bold text-black ml-10">Review Analysis</h1>
+        <p className="text-muted-foreground text-sm md:text-base ml-10">
           Monitor and analyze customer reviews for authenticity and sentiment
         </p>
       </div>

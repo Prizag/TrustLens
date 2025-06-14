@@ -121,8 +121,8 @@ export default function CustomersPage() {
   return (
     <div className="p-4 md:p-6 space-y-6 w-full max-w-none">
       <div className="flex flex-col gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-black">Customer Analysis</h1>
-        <p className="text-muted-foreground text-sm md:text-base">
+        <h1 className="text-2xl md:text-3xl font-bold text-black ml-10">Customer Analysis</h1>
+        <p className="text-muted-foreground text-sm md:text-base ml-10">
           Monitor customer behavior and detect suspicious patterns
         </p>
       </div>
@@ -138,13 +138,13 @@ export default function CustomersPage() {
               <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
                 <div className="flex flex-col gap-4 mb-6">
                    <TabsList className="grid w-full lg:w-auto grid-cols-3 bg-slate-100 p-1">
-                <TabsTrigger value="all" className={`text-xs md:text-sm text-black ${activeTab === "all" ? "bg-white rounded-md p-1" : ""}`}>
+                <TabsTrigger value="all" className="text-xs md:text-sm data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:rounded-md data-[state=active]:p-1">
                   All
                 </TabsTrigger>
-                <TabsTrigger value="authentic" className={`text-xs md:text-sm text-black ${activeTab === "authentic" ? "bg-white rounded-md p-1" : ""}`}>
+                <TabsTrigger value="authentic" className="text-xs md:text-sm data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:rounded-md data-[state=active]:p-1">
                   Trusted
                 </TabsTrigger>
-                <TabsTrigger value="suspicious" className={`text-xs md:text-sm text-black ${activeTab === "suspicious" ? "bg-white rounded-md p-1" : ""}`}>
+                <TabsTrigger value="suspicious" className="text-xs md:text-sm data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:rounded-md data-[state=active]:p-1">
                   Suspicious
                 </TabsTrigger>
               </TabsList>
