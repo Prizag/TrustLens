@@ -1,4 +1,4 @@
-import { Inter } from "next/font/google"
+ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { SidebarProvider } from "@/components/ui/sidebar"
@@ -17,14 +17,18 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <SidebarProvider>
-            <div className="flex min-h-screen w-full bg-white">
-              <div className="fixed top-0 left-0 h-screen w-64 z-50">
+           <div className="flex min-h-screen w-full bg-white">
+  {/* Sidebar */}
+  <div className=" sm:block sm:fixed sm:top-0 sm:left-0 sm:h-screen sm:w-64 z-50">
     <DashboardSidebar />
   </div>
-             <main className="ml-64 flex-1 bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-50 overflow-x-hidden">
+
+  {/* Main Content */}
+  <main className="w-full sm:ml-64 flex-1 bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-50 overflow-x-hidden">
     {children}
   </main>
-            </div>
+</div>
+
           </SidebarProvider>
         </ThemeProvider>
       </body>
