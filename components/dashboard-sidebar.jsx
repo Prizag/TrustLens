@@ -30,12 +30,16 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { SignOutButton ,useUser } from "@clerk/nextjs";
 
 export function DashboardSidebar() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
 
   const isActive = (path) => pathname === path
+    const { isLoaded, isSignedIn, user } = useUser();
+
+  if (!isLoaded || !isSignedIn) return <div>Loading...</div>;
 
   return (
     <>
@@ -145,19 +149,20 @@ export function DashboardSidebar() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Avatar>
-                  <AvatarImage src="/placeholder.svg" />
-                  <AvatarFallback className="bg-blue-200 text-blue-700">
-                    JD
-                  </AvatarFallback>
+                  
+                    <img src={user.imageUrl} alt="Profile" width={80} />
+                
                 </Avatar>
                 <div>
-                  <p className="text-sm font-medium text-black">Jane Doe</p>
+                  <p className="text-sm font-medium text-black">{user.fullName}</p>
                   <p className="text-xs text-muted-foreground">Admin</p>
                 </div>
               </div>
+              <SignOutButton className="text-slate-400">
               <Button variant="ghost" size="icon">
                 <LogOut className="h-4 w-4" />
               </Button>
+              </SignOutButton>
             </div>
           </SidebarFooter>
         </div>

@@ -11,10 +11,14 @@ import { Slider } from "@/components/ui/slider"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { User, Shield, Bell, Moon, Sun, Laptop, Key, Save, CheckCircle, Sliders, Clock } from "lucide-react"
+import { useUser } from "@clerk/nextjs"
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("account")
   const [theme, setTheme] = useState("system")
+  const { isLoaded, isSignedIn, user } = useUser();
+
+  if (!isLoaded || !isSignedIn) return <div>Loading...</div>;
 
   return (
     <div className="p-4 md:p-6 space-y-6 w-full max-w-none">
@@ -53,8 +57,7 @@ export default function SettingsPage() {
             <CardContent className="space-y-6">
               <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
                 <Avatar className="h-16 w-16 md:h-20 md:w-20">
-                  <AvatarImage src="/placeholder.svg?height=80&width=80&text=JD" />
-                  <AvatarFallback className="text-lg">JD</AvatarFallback>
+                   <img src={user.imageUrl} alt="Profile" width={80} />
                 </Avatar>
                 <div className="space-y-2">
                   <h3 className="font-medium text-black">Profile Picture</h3>
@@ -72,11 +75,11 @@ export default function SettingsPage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2 text-black">
                   <Label htmlFor="name">Full Name</Label>
-                  <Input id="name" defaultValue="Jane Doe" className="bg-white border-slate-200" />
+                  <Input id="name" defaultValue={user.fullName} className="bg-white border-slate-200" />
                 </div>
                 <div className="space-y-2 text-black">
                   <Label htmlFor="email">Email Address</Label>
-                  <Input id="email" defaultValue="jane.doe@example.com" className="bg-white border-slate-200" />
+                  <Input id="email" defaultValue={user.emailAddresses} className="bg-white border-slate-200" />
                 </div>
                 <div className="space-y-2  text-black">
                   <Label htmlFor="title">Job Title</Label>

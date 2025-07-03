@@ -1,44 +1,11 @@
- import { Inter } from "next/font/google"
-import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { SidebarProvider } from "@/components/ui/sidebar"
-import { DashboardSidebar } from "@/components/dashboard-sidebar"
-import {ClerkProvider} from "@clerk/nextjs"
-import { SignedIn, SignedOut,RedirectToSignIn, SignIn} from "@clerk/nextjs";
+"use client"
 
+import { SignUp } from "@clerk/nextjs"
+import { Card, CardContent } from "@/components/ui/card"
 
-const inter = Inter({ subsets: ["latin"] })
-
-export const metadata = {
-  title: "TrustLens | Fake Review Detection",
-  description: "ML-powered dashboard for detecting fake reviews and suspicious activity",
-}
-
-export default function RootLayout({ children }) {
+export default function SignUpPage() {
   return (
-    <ClerkProvider>
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
-        <SignedIn>
-          <SidebarProvider>
-           <div className="flex min-h-screen w-full bg-white">
-  {/* Sidebar */}
-  <div className=" sm:block sm:fixed sm:top-0 sm:left-0 sm:h-screen sm:w-64 z-50">
-    <DashboardSidebar />
-  </div>
-
-  {/* Main Content */}
-  <main className="w-full sm:ml-64 flex-1 bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-50 overflow-x-hidden">
-    {children}
-  </main>
-</div>
-
-          </SidebarProvider>
-         
-      </SignedIn>
-      <SignedOut>
-         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
         {/* Logo and Header */}
         <div className="text-center space-y-2">
@@ -48,18 +15,18 @@ export default function RootLayout({ children }) {
             </div>
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            Welcome Back
+            Join TrustLens
           </h1>
-          <p className="text-muted-foreground">Sign in to your TrustLens account</p>
+          <p className="text-muted-foreground">Create your account to get started</p>
         </div>
 
-        {/* Clerk Sign In Component */}
-   
-            <SignIn
+        {/* Clerk Sign Up Component */}
+       
+            <SignUp
               appearance={{
                 elements: {
                   rootBox: "w-full",
-                  card: "shadow-none border-0 ",
+                  card: "shadow-0 border-0 bg-transparent",
                   headerTitle: "hidden",
                   headerSubtitle: "hidden",
                   socialButtonsBlockButton: "bg-white hover:bg-gray-50 border-gray-200 text-gray-700",
@@ -86,21 +53,15 @@ export default function RootLayout({ children }) {
                 },
               }}
               redirectUrl="/"
-              signUpUrl="/sign-up"
-              routing="hash"
+              signInUrl="/sign-in"
             />
-         
+      
 
         {/* Security Notice */}
         <div className="text-center text-xs text-muted-foreground">
-          <p>Protected by enterprise-grade security</p>
+          <p>Your data is protected with enterprise-grade encryption</p>
         </div>
       </div>
     </div>
-      </SignedOut>
-        </ThemeProvider>
-      </body>
-    </html>
-    </ClerkProvider>
   )
 }
