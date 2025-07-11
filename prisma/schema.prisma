@@ -37,7 +37,9 @@ model Customer {
   phone         String?
   address       String?
   profileImage  String?
-  metaMasked    String?
+  // --- CHANGE 1 (SUGGESTION): Renamed for clarity ---
+  // Renamed 'metaMasked' to 'walletAddress' for better readability and standard practice.
+  walletAddress String?
   avgTrustScore BigInt?
   seller        Seller        @relation(fields: [sellerId], references: [id])
   reviews       Review[]
@@ -54,6 +56,15 @@ model Review {
   updatedAt  DateTime @updatedAt
   title      String?
   response   String?
+  
+  // --- CHANGE 2 (NECESSARY): Added fields for TrustLens integration ---
+  // The wallet address of the user who wrote the review. This is essential for creating the on-chain attestation.
+  userAddress String?
+  
+  // A flag to track if this review has been successfully attested on the blockchain.
+  // Defaults to 'false' to ensure we only try to attest once.
+  isAttested  Boolean  @default(false)
+
   customer   Customer @relation(fields: [customerId], references: [id])
   seller     Seller   @relation(fields: [sellerId], references: [id])
 }
