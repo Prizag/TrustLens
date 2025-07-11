@@ -1,26 +1,93 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../lib/generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
-model User {
-  id            String    @id @default(uuid())
-  clerkUserId   String    @unique // clerk user id
-  email         String    @unique
-  name          String?
-  imageUrl      String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
 
-  @@map("users")
+model Seller {
+  id                  String        @id @default(uuid())
+  name                String
+  email               String        @unique
+  password_hash       String
+  createdAt           DateTime      @default(now())
+  trustScore          Float?
+  authenticationValue String?
+  graphData           String?
+  updatedAt           DateTime      @updatedAt
+  phone               String?
+  address             String?
+  profileImage        String?
+  clerkUserId         String        @unique
+  products            String[]
+  customers           Customer[]
+  reviews             Review[]
+  transactions        Transaction[]
+}
+
+model Customer {
+  id            String        @id @default(uuid())
+  sellerId      String
+  name          String
+  email         String        @unique
+  createdAt     DateTime      @default(now())
+  phone         String?
+  address       String?
+  profileImage  String?
+  metaMasked    String?
+  avgTrustScore BigInt?
+  seller        Seller        @relation(fields: [sellerId], references: [id])
+  reviews       Review[]
+  transactions  Transaction[]
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  sellerId   String
+  customerId String
+  rating     Int?
+  comment    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  title      String?
+  response   String?
+  customer   Customer @relation(fields: [customerId], references: [id])
+  seller     Seller   @relation(fields: [sellerId], references: [id])
+}
+
+model Transaction {
+  transactionID    String    @id @default(uuid())
+  sellerId         String
+  customerId       String
+  transactionAmt   Float
+  productCD        String?
+  card_id          BigInt?
+  issuer_bank_code Float?
+  card_network     String?
+  card_bin         Int?
+  card_type        String?
+  addr1            BigInt?
+  dist1            Float?
+  dist2            Float?
+  status           String?
+  deviceType       String?
+  deviceInfo       String?
+  operating_system String?
+  browser_type     String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  paymentMethod    String?
+  reference        String?
+  isFraud          Boolean?
+  P_emaildomain    String?
+  R_emaildomain    String?
+  addr2            BigInt?
+  Transaction_Date DateTime? @map("Transaction Date") @db.Date
+  Transaction_Time DateTime? @map("Transaction Time") @db.Time(6)
+  trustScore       BigInt?
+  customer         Customer  @relation(fields: [customerId], references: [id])
+  seller           Seller    @relation(fields: [sellerId], references: [id])
 }
