@@ -7,7 +7,12 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
-
+model Product {
+  id        Int     @id @default(autoincrement())
+  title     String
+  sellerId  String 
+  seller    Seller  @relation(fields: [sellerId], references: [id])
+}
 model Seller {
   id                  String        @id @default(uuid())
   name                String
@@ -22,7 +27,7 @@ model Seller {
   address             String?
   profileImage        String?
   clerkUserId         String        @unique
-  products            String[]
+  products            Product[]
   customers           Customer[]
   reviews             Review[]
   transactions        Transaction[]
