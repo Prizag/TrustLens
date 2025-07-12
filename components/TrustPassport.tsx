@@ -28,7 +28,7 @@ export default function TrustPassport() {
 
   const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
   if (!contractAddress) {
-    throw new Error('▶️ Please set NEXT_PUBLIC_CONTRACT_ADDRESS in .env.local');
+    throw new Error('▶ Please set NEXT_PUBLIC_CONTRACT_ADDRESS in .env.local');
   }
 
   const connectWallet = async () => {

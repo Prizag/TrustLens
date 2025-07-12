@@ -6,20 +6,28 @@ import { RecentAlerts } from "@/components/dashboard/recent-alerts";
 import { checkSeller } from "../lib/checkUser";
 import { db } from "../lib/prisma.js";
 
-async function analyzeReviewIfNeeded(review) {
-  // Check if we've already analyzed and attested this review
+/**
+ * This server-side function handles the analysis and on-chain attestation for a single review.
+ * It's designed to be idempotent: it won't re-process or re-attest a review that's already done.
+ * @param {object} review - The review object from the Prisma database.
+ * @returns {Promise<object>} - An object containing the analysis result and attestation status.
+ */
+async function analyzeAndAttestReview(review) {
+  // Efficiency Check: If the review is already processed and on-chain, return immediately.
   if (review.response && review.isAttested) {
     return { ...JSON.parse(review.response), isAttested: true };
   }
 
-  // Analyze with ML API if needed
+  // Step 1: Analyze the review with the ML API if it hasn't been analyzed before.
   const analysisResult = review.response ? JSON.parse(review.response) : await (async () => {
+    console.log(`Analyzing review ${review.id} with ML model...`);
     const res = await fetch('https://bert-fake-review-api.onrender.com/predict', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text: review.comment }),
     });
     const data = await res.json();
+    // Save the ML response to the database to avoid re-analyzing in the future.
     await db.review.update({
       where: { id: review.id },
       data: { response: JSON.stringify(data), updatedAt: new Date() },
@@ -29,39 +37,34 @@ async function analyzeReviewIfNeeded(review) {
 
   let attestationSucceeded = review.isAttested;
 
-  // --- THIS IS THE BLOCKCHAIN INTEGRATION LOGIC ---
+  // Step 2: THE AUTOMATION TRIGGER for the blockchain.
+  // This logic runs if the ML model deems the review "genuine", it hasn't been attested yet,
+  // and a user wallet address is present.
   if (analysisResult.label === "genuine" && !review.isAttested && review.userAddress) {
-    console.log(`Review ${review.id} is genuine. Attempting on-chain attestation...`);
+    console.log(`✅ Review ${review.id} is genuine. Triggering on-chain attestation...`);
     try {
-      // --- UPDATE APPLIED HERE ---
-      // We now call our new, more secure API endpoint, sending only the review ID.
+      // This fetch call securely triggers our backend API route.
       const attestResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/attest`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          reviewId: review.id // Just send the review ID
-        }),
+        // We only send the review ID. The backend handles the rest securely.
+        body: JSON.stringify({ reviewId: review.id }),
       });
 
-      // The logic below remains the same, but now it relies on the backend to have done its job.
       if (attestResponse.ok) {
-        console.log(`Attestation successful for review ${review.id}`);
-        // The backend now handles updating the database, so we can trust the process is complete.
-        // For immediate UI feedback, we can assume success.
+        console.log(`🎉 Attestation successful for review ${review.id}`);
+        // This is an "optimistic update". We assume the UI can show this as attested now.
+        // The database is updated by the API route itself.
         attestationSucceeded = true;
       } else {
-        // Log the error from the API for better debugging
         const errorData = await attestResponse.json();
-        console.error(`Attestation failed for review ${review.id}:`, errorData.error);
+        console.error(`❌ Attestation API failed for review ${review.id}:`, errorData.error || 'Unknown API error');
       }
     } catch (error) {
-      console.error("Error calling attest API:", error);
+      console.error("❌ Network error calling /api/attest:", error);
     }
   }
 
-  // NOTE: This now optimistically returns `true` if the API call was okay.
-  // For a more robust system, you might re-fetch the review from the DB here
-  // to get the definitive `isAttested` status. For this app, this is fine.
   return { ...analysisResult, isAttested: attestationSucceeded };
 }
 
@@ -76,22 +79,23 @@ export default async function Home() {
     );
   }
 
-  // Refetch reviews at the start to ensure we have the latest `isAttested` status
+  // Fetch all of the seller's reviews from the database.
   const reviews = await db.review.findMany({
     where: { sellerId: seller.id },
-    orderBy: { createdAt: 'desc' } // Process newest reviews first
+    orderBy: { createdAt: 'desc' } // Process newest reviews first.
   });
 
+  // Concurrently process all reviews. This is where the magic happens.
+  // The `analyzeAndAttestReview` function is called for every review.
+  const processedReviews = await Promise.all(
+    reviews.map(r => analyzeAndAttestReview(r))
+  );
+
+  // --- Calculate statistics based on the processed results ---
   let totalConfidence = 0;
   let genuineCount = 0;
   let verifiedOnChainCount = 0; 
 
-  // We re-map the processing results here
-  const processedReviews = await Promise.all(
-    reviews.map(r => analyzeReviewIfNeeded(r))
-  );
-
-  // Calculate stats based on the results of the processing
   for (const result of processedReviews) {
     if (result.label === "genuine") genuineCount += 1;
     if (result.isAttested) verifiedOnChainCount += 1;
@@ -101,11 +105,12 @@ export default async function Home() {
   const count = processedReviews.length || 1;
 
   const scores = {
-    overall: Math.round(totalConfidence / count),
-    reviewAuth: Math.round((genuineCount / count) * 100),
-    customerTrust: Math.min(100, Math.round((genuineCount / count) * 110)),
+    overall: Math.round(totalConfidence / count) || 0,
+    reviewAuth: Math.round((genuineCount / count) * 100) || 0,
+    customerTrust: Math.min(100, Math.round((genuineCount / count) * 110)) || 0,
   };
 
+  // --- Render the final dashboard UI ---
   return (
     <div className="p-4 md:p-6 space-y-6 w-full max-w-none">
       <div className="flex flex-col gap-4">

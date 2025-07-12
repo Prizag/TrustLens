@@ -37,9 +37,11 @@ model Customer {
   phone         String?
   address       String?
   profileImage  String?
-  // --- CHANGE 1 (SUGGESTION): Renamed for clarity ---
-  // Renamed 'metaMasked' to 'walletAddress' for better readability and standard practice.
-  walletAddress String?
+  
+  // DELETE THE OLD `metaMasked` FIELD IF IT'S STILL THERE.
+  // ADD THIS LINE:
+  walletAddress String?       // This is the correct field name.
+
   avgTrustScore BigInt?
   seller        Seller        @relation(fields: [sellerId], references: [id])
   reviews       Review[]
